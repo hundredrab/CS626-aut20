@@ -1,88 +1,139 @@
-## ------------------------------------
-import numpy as np
-import nltk
-nltk.download('brown')
-nltk.download('universal_tagset')
-from nltk.corpus import brown
+## -------------------------------------
 from collections import defaultdict
 
-## ------------------------------------
+import nltk
+import numpy as np
+import seaborn as sb
+from nltk.corpus import brown
+from sklearn.model_selection import KFold
+
+nltk.download('brown')
+nltk.download('universal_tagset')
+
+## -------------------------------------
 
 tags = set(w[1] for w in brown.tagged_words(tagset='universal')).union({'^'})
 
-## ------------------------------------ Load dataset and create transition and emission counts' dicts
+##
+known_words = set(brown.words())
+## ------
 
-dataset = brown.tagged_sents(tagset='universal')
-print(len(dataset))
-emissions = defaultdict(dict)
-transitions = defaultdict(dict)
-for sent in dataset:
-    sent.insert(0, ('^', '^'))
-    for word, tag in sent:
-        word = word.lower()
-        if word in emissions[tag]:
-            emissions[tag][word] += 1
-        else:
-            emissions[tag][word] = 1
-    for i, (word, tag) in enumerate(sent):
-        if i == 0:
-            continue # skip '^'
-        if tag in transitions[sent[i-1][1]]:
-            transitions[sent[i-1][1]][tag] += 1
-        else:
-            transitions[sent[i-1][1]][tag] = 1
+class HMM:
+    def __init__(self):
+        self.emissions = defaultdict(dict)
+        self.transitions = defaultdict(dict)
 
-## ------------------------------------
+    def train(self, dataset):
+        for sent in dataset:
+            sent = sent[:]
+            sent.insert(0, ('^', '^'))
+            for word, tag in sent:
+                word = word.lower()
+                if word in self.emissions[tag]:
+                    self.emissions[tag][word] += 1
+                else:
+                    self.emissions[tag][word] = 1
+            for i, (word, tag) in enumerate(sent):
+                if i == 0:
+                    continue  # skip '^'
+                if tag in self.transitions[sent[i-1][1]]:
+                    self.transitions[sent[i-1][1]][tag] += 1
+                else:
+                    self.transitions[sent[i-1][1]][tag] = 1
 
-emissions['DET']
-transitions['DET']
-for tag in transitions:
-    print(transitions[tag])
+        for tag in self.emissions:
+            if tag == '^':
+                continue
+            self.emissions[tag]['<UNK>'] = 1
+            for word in known_words:
+                if word not in self.emissions[tag].keys():
+                    self.emissions[tag][word] = 1
+                else:
+                    self.emissions[tag][word] += 0
 
-## ------------------------------------ Normalize to probabilities
+        ## Normalize to probabilities
 
-for tag, data in transitions.items():
-    total = sum(data.values())
-    transitions[tag] = {
-        k: v/total for k,v in data.items()}
+        for tag, data in self.transitions.items():
+            total = sum(data.values())
+            self.transitions[tag] = {
+                k: v/total for k, v in data.items()}
 
-for tag, data in emissions.items():
-    total = sum(data.values())
-    emissions[tag] = {
-        k: v/total for k, v in data.items()}
+        for tag, data in self.emissions.items():
+            total = sum(data.values())
+            self.emissions[tag] = {
+                k: v/total for k, v in data.items()}
 
-## ------------------------------------ Make sure there are transitions between all states
-for tag1 in tags:
-    for tag2 in tags:
-        if tag2 not in transitions[tag1]:
-            print(tag1, '->', tag2, 'is 0')
-            transitions[tag1][tag2] = 0
+        ## Make sure there are self.transitions between all states
+        for tag1 in tags:
+            for tag2 in tags:
+                self.transitions[tag1]['^'] = 0  # Can't go back to ^
+                if tag2 not in self.transitions[tag1]:
+                    self.transitions[tag1][tag2] = 0.00001
 
-## ------------------------------------ Testing 1 (ONE) sentence
+    def tag_pos(self, sentence):
+        """On given a tokenized sentence (list) returns a list of POS tokens."""
+        sentence = [x if x in known_words else '<UNK>' for x in sentence]
+        sentence.insert(0, '^')
+        matrix = [{tag: (0, ) for tag in tags} for _ in sentence]
+        matrix[0]['^'] = (1, )
+        for i, word in enumerate(sentence):
+            word = word.lower()
+            if i == 0:
+                continue
+            for curr in tags:
+                if word not in self.emissions[curr]:
+                    self.emissions[curr][word] = 0
+                all_p = [(self.emissions[curr][word] * self.transitions[prev][curr]
+                          * matrix[i-1][prev][0], prev) for prev in tags]
+                matrix[i][curr] = max(all_p)
 
-test_sent = nltk.word_tokenize("This girl is called Hilarious!")
-test_sent.insert(0, '^')
-test_sent
-## ------------------------------------ Viterbi matrix (actually a list of dicts)
+        test_pos = [max(matrix[-1], key=lambda key: matrix[-1][key])]
+        while matrix:
+            row = max(matrix.pop().values())
+            test_pos.insert(0, row[-1])
+        return(test_pos[2:])
 
-matrix = [{tag: (0, ) for tag in tags} for _ in test_sent]
-matrix[0]['^'] = (1, )
-for i, word in enumerate(test_sent):
-    word = word.lower()
-    if i == 0:
-        continue
-    for curr in tags:
-        if word not in emissions[curr]:
-            emissions[curr][word] = 0
-        all_p = [(emissions[curr][word] * transitions[prev][curr] * matrix[i-1][prev][0], prev) for prev in tags]
-        matrix[i][curr] = max(all_p)
+##
+# sentence = nltk.word_tokenize("He said that he will go soon")
+#tag_pos(sentence)
+# hmm = HMM()
+# hmm.train(dataset)
+# hmm.tag_pos(sentence)
 
-## ------------------------------------ Finally, print it out
-import operator
+## ---------------------Load dataset and create transition and emission counts' dicts
 
-test_pos = [max(matrix[i].items(), key = operator.itemgetter(1))[0]]
-while matrix:
-    row = max(matrix.pop().values())
-    test_pos.insert(0, row[-1])
-print(test_pos[1:])
-print(test_sent)
+full_dataset = np.asarray(brown.tagged_sents(tagset='universal'))
+print(f"Total sents = {len(full_dataset)}")
+
+##
+tag_to_i = dict([(j,i) for (i, j) in enumerate(tags)])
+tags = list(tags)
+confusion = np.zeros((len(tags), len(tags)))
+def calculate_accuracy(row):
+    # print(row.shape)
+    sent, ground = zip(*row[0])
+    pred = model.tag_pos(sent)
+    for i,j in zip(ground, pred):
+        confusion[tag_to_i[i]][tag_to_i[j]] += 1
+    return sum(x==y for x,y in zip(ground, pred))
+
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+for train_index, test_index in kf.split(full_dataset):
+    train_set = full_dataset[train_index]
+    test_set = full_dataset[test_index][:3]
+    model = HMM()
+    model.train(train_set)
+    print("trained", end="")
+    ts = test_set.reshape(-1, 1)
+    tr = train_set.reshape(-1, 1)
+    # correct_train = sum(np.apply_along_axis(calculate_accuracy, 1, tr))
+    # total_train = sum(np.apply_along_axis(lambda x: len(x[0]), 1, tr))
+
+    correct = sum(np.apply_along_axis(calculate_accuracy, 1, ts))
+    total = sum(np.apply_along_axis(lambda x: len(x[0]), 1, ts))
+    print(f"Test accuracy: {100 * correct/total}")
+##
+confusion = confusion/confusion.sum(axis=0)
+confusion = np.nan_to_num(confusion)
+sb.heatmap(confusion, yticklabels=tags, xticklabels=tags)
