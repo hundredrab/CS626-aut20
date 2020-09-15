@@ -20,22 +20,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix,classification_report,accuracy_score
 
-nltk.download('brown')
-nltk.download('universal_tagset')
-
-dataset_sentances = brown.sents()
-dataset_tagged = brown.tagged_sents(tagset = 'universal')
-w2v_mapping = Word2Vec(dataset_sentances, size=50)
-
-tags_set = list(set([tag for (_, tag) in brown.tagged_words(tagset='universal')]))
-tags_set.extend(["<^>","<$>"])
-print(tags_set)
-tags_set.sort()
-tags={}
-for i,tag in enumerate(tags_set):
-  tags[tag]=i
-tags_list = list(tags_set)
-
 def OneHotEncoder(tag, total_tag):
     return np.eye(total_tag)[tag]
 
@@ -208,7 +192,7 @@ def featureExtractor(word_id, sample, word2vec,tags):
     else:
         feature_vector.append([0])
       
-    #Set the bit if word is numberic
+    #Set the bit if word is numeric
     if sample[word_id][0].isdigit():
       feature_vector.append([1])
     else:
@@ -222,15 +206,6 @@ def featureExtractor(word_id, sample, word2vec,tags):
 
     flat_list = [item for sublist in feature_vector for item in sublist]
     return flat_list
-
-print("Extracting Features")
-X_dataset=[]
-Y_dataset=[]
-for sample in tqdm(dataset_tagged):
-    sample = [("","<^>")] + sample + [("","<$>")]
-    for j in range(2,len(sample)-1):
-        X_dataset.append(featureExtractor(j, sample, w2v_mapping, tags_list))
-        Y_dataset.append(tags[sample[j][1]])
 
 class SVM:
 
@@ -277,33 +252,57 @@ class SVM:
       return loss, dW
     
     def predict(self, X):
-        
-        pred_ys = np.zeros(X.shape[1])
-        f_x_mat = self.W.dot(X)
-        pred_ys = np.argmax(f_x_mat, axis=0)
-        h_x_mat = 1.0 / (1.0 + np.exp(-f_x_mat))
-        h_x_mat = h_x_mat.squeeze()
-        return pred_ys, h_x_mat
+        return np.argmax(self.W.dot(X), axis=0)
 
+def pos_tagger(text,model):
+  sample=[]
+  for i in text.split():
+    sample.append([i,"X"])
+  sample = [["","<^>"],["","<^>"]] + sample + [["","<$>"]]
+  for j in range(2,len(sample)-1):
+    x=[featureExtractor(j, sample, w2v_mapping, tags_list)]
+    inp=np.array(x).astype(np.float).T
+    y_pred = model.predict(inp)
+    sample[j][1]=tags_list[y_pred[0]]
+  return sample[2:-1]
+
+nltk.download('brown')
+nltk.download('universal_tagset')
+dataset_sentances = brown.sents()
+dataset_tagged = brown.tagged_sents(tagset = 'universal')
+w2v_mapping = Word2Vec(dataset_sentances, size=50)
+print("Universal Tags :")
+tags_set = list(set([tag for (_, tag) in brown.tagged_words(tagset='universal')]))
+tags_set.extend(["<^>","<$>"])
+print(tags_set)
+tags_set.sort()
+tags={}
+for i,tag in enumerate(tags_set):
+  tags[tag]=i
+tags_list = list(tags_set)
+print("Extracting Features")
+X_dataset=[]
+Y_dataset=[]
+for sample in tqdm(dataset_tagged):
+    sample = [("","<^>"),("","<^>"),("","<^>")] + sample + [("","<$>")]
+    for j in range(3,len(sample)-1):
+        X_dataset.append(featureExtractor(j, sample, w2v_mapping, tags_list))
+        Y_dataset.append(tags[sample[j][1]])
 X_dataset=np.array(X_dataset).astype(np.float)
 Y_dataset=np.array(Y_dataset)
 
-X_dataset.shape
-
 print("Traing POS-TAGGER")
 model = SVM()
-epoch=20
+epoch=30
 crosss_validator = KFold(n_splits=5, random_state=42, shuffle=False)
 for i in range(epoch):
   epoch_accuracy=[]
   epoch_loss=[]
   for train_index, test_index in crosss_validator.split(X_dataset):
     X_train, X_test, y_train, y_test = X_dataset[train_index], X_dataset[test_index], Y_dataset[train_index], Y_dataset[test_index]
-    X_train=np.transpose(X_train)
-    X_test=np.transpose(X_test)
-    loss = model.train(X_train, y_train, batch_size=128, lr=0.01,regularization = 0.001)
+    loss = model.train(X_train.T, y_train, batch_size=256, lr=0.01,regularization = 0.0001)
     epoch_loss.extend(loss)
-    y_pred = model.predict(X_test)[0]
+    y_pred = model.predict(X_test.T)
     epoch_accuracy.append(np.mean(y_test == y_pred))
   print ('epoch no : %d  accuracy: %f  loss: %f' % (i+1,np.mean(epoch_accuracy),np.mean(epoch_loss)) )
 
@@ -312,7 +311,7 @@ true_tag=[]
 for train_index, test_index in crosss_validator.split(X_dataset):
     X_train, X_test, y_train, y_test = X_dataset[train_index], X_dataset[test_index], Y_dataset[train_index], Y_dataset[test_index]
     X_test=np.transpose(X_test)
-    y_pred = model.predict(X_test)[0]
+    y_pred = model.predict(X_test)
     predicted_tag.extend(y_pred)
     true_tag.extend(y_test)
 
@@ -320,25 +319,48 @@ print("Accuracy is : ",accuracy_score(true_tag, predicted_tag)*100)
 print("Classification report")
 print(classification_report(true_tag, predicted_tag))
 print("Confusion Matrix")
-cm_df = pd.DataFrame(confusion_matrix(true_tag, predicted_tag,labels=[0,1,2,3,4,5,6,7,8,9,10,11,12,13]),index = ['.', '<$>', '<^>','ADJ','ADP', 'ADV', 'CONJ','DET', 'NOUN', 'NUM','PRON', 'PRT', 'VERB', 'X'], columns =['.', '<$>', '<^>','ADJ','ADP', 'ADV', 'CONJ','DET', 'NOUN', 'NUM','PRON', 'PRT', 'VERB', 'X'])
+cm_df = pd.DataFrame(confusion_matrix(true_tag, predicted_tag,labels=range(14)),index = tags_list, columns =tags_list)
 cm_df.drop(columns=["<$>","<^>"],inplace=True)
 cm_df.drop(["<$>","<^>"],inplace=True)
 cm_df=cm_df.div(cm_df.sum(axis=1)*0.01, axis=0).fillna(0)
-plt.figure(figsize=(8,6))
-ax=sns.heatmap(cm_df, annot=True ,fmt=".1f", cmap="Reds")
+plt.figure(figsize=(10,8))
+ax=sns.heatmap(cm_df, annot=True ,fmt=".2f", cmap="Reds")
 ax.set_ylim(12, 0)
 plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.show()
 
-# print("Per Tag Accuracy")
+# print("Per Tag Accuracy Comparision")
+hmm_per_class=[99.977626,87.330441,97.196992, 86.039065,99.281085,98.716235,90.614809,76.914278, 95.758399,83.165028,90.286143,18.84058 ]
+bilstm_per_class=[83.165028, 90.614809, 90.286143, 97.196992, 86.039065, 87.330441, 98.716235, 95.758399, 99.281085, 76.914278,18.84058 , 99.977626]
+
 per_class_accuracy=pd.DataFrame(np.diag(cm_df), index=[cm_df.index])
-ax = per_class_accuracy[[0]].plot(kind='bar', title ="Per Tag Accuracy", figsize=(10, 8), fontsize=12,legend=False)
-for i, v in enumerate(list(per_class_accuracy[0])):
-    plt.text(i - 0.30, v + 0.5, str(v)[:5])
+per_class_accuracy["SVM"]=per_class_accuracy[0]
+per_class_accuracy["HMM"]=hmm_per_class
+per_class_accuracy["BiLSTM"]=bilstm_per_class
+ax = per_class_accuracy[['SVM','HMM',"BiLSTM"]].plot(kind='bar', title ="Per Tag Accuracy Comparision", figsize=(25, 8), fontsize=14,legend=True)
+for i, v in enumerate(list(per_class_accuracy['SVM'])):
+    plt.text(i - 0.25, v + 0.5, str(v)[:4], fontsize=8)
+for i, v in enumerate(list(per_class_accuracy['HMM'])):
+    plt.text(i - 0.10, v + 0.5, str(v)[:4], fontsize=8)
+for i, v in enumerate(list(per_class_accuracy['BiLSTM'])):
+    plt.text(i + 0.10, v + 0.5, str(v)[:4], fontsize=8)
 ax.set_xlabel("Tag", fontsize=12)
-ax.set_ylabel("Accuracy", fontsize=12)
+ax.set_ylabel("Accuracy (%)", fontsize=12)
+# ax.tight_layout()
 plt.show()
 
+# for i in range(14):
+#   print((cm_df.to_numpy()[i][i]+cm_df.to_numpy().sum()-cm_df.to_numpy().sum(axis=0)[i])/cm_df.to_numpy().sum())
 
+# %matplotlib inline
+plt.figure(figsize=(35,5))
+ax=sns.heatmap(model.W, annot=False , cmap="Reds",yticklabels=tags_list)
+plt.title('SVM Weights')
+ax.set_ylim(12, 0)
+plt.ylabel('Tags')
+plt.xlabel('Features')
+plt.show()
 
+for i in pos_tagger(" Fears prejudicial aspects",model):
+  print(i[0],"->",i[1])
