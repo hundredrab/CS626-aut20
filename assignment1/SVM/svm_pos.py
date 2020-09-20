@@ -42,7 +42,7 @@ def featureExtractor(word_id, sample, word2vec,tags):
         else:
             feature_vector.append(word2vec[sample[word_id+idx][0]])
     #Add one-hot embedding of previous 3 tags
-    no_of_prev_tags = 3
+    no_of_prev_tags = 2
     for idx in reversed(range(1,no_of_prev_tags+1)):
         tag = sample[word_id-idx][1]
         feature_vector.append(OneHotEncoder(tags.index(tag),len(tags)))
@@ -293,7 +293,7 @@ Y_dataset=np.array(Y_dataset)
 
 print("Traing POS-TAGGER")
 model = SVM()
-epoch=30
+epoch=40
 crosss_validator = KFold(n_splits=5, random_state=42, shuffle=False)
 for i in range(epoch):
   epoch_accuracy=[]
@@ -308,12 +308,14 @@ for i in range(epoch):
 
 predicted_tag=[]
 true_tag=[]
+
 for train_index, test_index in crosss_validator.split(X_dataset):
     X_train, X_test, y_train, y_test = X_dataset[train_index], X_dataset[test_index], Y_dataset[train_index], Y_dataset[test_index]
     X_test=np.transpose(X_test)
     y_pred = model.predict(X_test)
     predicted_tag.extend(y_pred)
     true_tag.extend(y_test)
+
 
 print("Accuracy is : ",accuracy_score(true_tag, predicted_tag)*100)
 print("Classification report")
@@ -330,37 +332,34 @@ plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.show()
 
-# print("Per Tag Accuracy Comparision")
-hmm_per_class=[99.977626,87.330441,97.196992, 86.039065,99.281085,98.716235,90.614809,76.914278, 95.758399,83.165028,90.286143,18.84058 ]
-bilstm_per_class=[83.165028, 90.614809, 90.286143, 97.196992, 86.039065, 87.330441, 98.716235, 95.758399, 99.281085, 76.914278,18.84058 , 99.977626]
-
-per_class_accuracy=pd.DataFrame(np.diag(cm_df), index=[cm_df.index])
-per_class_accuracy["SVM"]=per_class_accuracy[0]
-per_class_accuracy["HMM"]=hmm_per_class
-per_class_accuracy["BiLSTM"]=bilstm_per_class
-ax = per_class_accuracy[['SVM','HMM',"BiLSTM"]].plot(kind='bar', title ="Per Tag Accuracy Comparision", figsize=(25, 8), fontsize=14,legend=True)
-for i, v in enumerate(list(per_class_accuracy['SVM'])):
-    plt.text(i - 0.25, v + 0.5, str(v)[:4], fontsize=8)
-for i, v in enumerate(list(per_class_accuracy['HMM'])):
-    plt.text(i - 0.10, v + 0.5, str(v)[:4], fontsize=8)
-for i, v in enumerate(list(per_class_accuracy['BiLSTM'])):
-    plt.text(i + 0.10, v + 0.5, str(v)[:4], fontsize=8)
-ax.set_xlabel("Tag", fontsize=12)
-ax.set_ylabel("Accuracy (%)", fontsize=12)
-# ax.tight_layout()
-plt.show()
-
-# for i in range(14):
-#   print((cm_df.to_numpy()[i][i]+cm_df.to_numpy().sum()-cm_df.to_numpy().sum(axis=0)[i])/cm_df.to_numpy().sum())
-
 # %matplotlib inline
-plt.figure(figsize=(35,5))
-ax=sns.heatmap(model.W, annot=False , cmap="Reds",yticklabels=tags_list)
+plt.figure(figsize=(35,8))
+ax=sns.heatmap(np.absolute(model.W), annot=False , cmap="Reds",yticklabels=tags_list)
 plt.title('SVM Weights')
-ax.set_ylim(12, 0)
+ax.set_ylim(13, 0)
 plt.ylabel('Tags')
 plt.xlabel('Features')
 plt.show()
 
-for i in pos_tagger(" Fears prejudicial aspects",model):
-  print(i[0],"->",i[1])
+# hmm_per_class=[99.977626,87.330441,97.196992, 86.039065,99.281085,98.716235,90.614809,76.914278, 95.758399,83.165028,90.286143,18.84058 ]
+# bilstm_per_class=[99.92, 94.86, 98.69, 97.59, 99.59, 99.65, 98.86, 97.74, 99.49, 97.67,99.58 , 83.65]
+
+# per_class_accuracy=pd.DataFrame(np.diag(cm_df), index=[cm_df.index])
+# per_class_accuracy["SVM"]=per_class_accuracy[0]
+# per_class_accuracy["HMM"]=hmm_per_class
+# per_class_accuracy["BiLSTM"]=bilstm_per_class
+# ax = per_class_accuracy[['SVM','HMM',"BiLSTM"]].plot(kind='bar', title ="Per Tag Accuracy Comparision", figsize=(25, 8), fontsize=14,legend=True)
+# for i, v in enumerate(list(per_class_accuracy['SVM'])):
+#     plt.text(i - 0.25, v + 0.5, str(v)[:4], fontsize=8)
+# for i, v in enumerate(list(per_class_accuracy['HMM'])):
+#     plt.text(i - 0.08, v + 0.5, str(v)[:4], fontsize=8)
+# for i, v in enumerate(list(per_class_accuracy['BiLSTM'])):
+#     plt.text(i + 0.10, v + 0.5, str(v)[:4], fontsize=8)
+# # aset_color('r')
+# ax.set_xlabel("Tag", fontsize=12)
+# ax.set_ylabel("Accuracy (%)", fontsize=12)
+# # ax.tight_layout()
+# plt.show()
+
+
+
