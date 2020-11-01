@@ -130,10 +130,10 @@ def calculate_accuracy(row):
             continue
         confusion[tag_to_i[i]][tag_to_i[j]] += 1
     ret = sum(x==y for x,y in zip(ground, pred))
-    if ret < len(sent)/2:
-        print("\t".join(sent))
-        print("\t".join(ground))
-        print("\t".join(pred))
+    # if ret < len(sent)/2:
+        # print("\t".join(sent))
+        # print("\t".join(ground))
+        # print("\t".join(pred))
     return ret
 
 

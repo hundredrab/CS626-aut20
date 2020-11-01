@@ -35,6 +35,7 @@ nltk.download('punkt')
 # Glove dictionary 200 dimentions
 # !wget https://www.cse.iitb.ac.in/~kartavya/glove_dict_tensor.pkl
 
+##
 import pickle
 pickle_in = open("glove_dict_tensor.pkl","rb")
 glove = pickle.load(pickle_in)
@@ -56,6 +57,7 @@ sentence_tags = brown.tagged_words(tagset='universal')
 print(tagged_sentences[0])
 print(sentences[0])
 
+## 
 tag_set = list(set([tag for _,tag in sentence_tags]))
 tag_set.extend(['PAD'])
 tag_set.sort()
@@ -66,6 +68,7 @@ sentence_tags = None
 id2tag = {v: k for k, v in tag2id.items()}
 tag2id
 
+##
 def word2glove(word):
   try:
     embed = glove[word.lower()]
