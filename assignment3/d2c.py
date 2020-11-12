@@ -11,6 +11,9 @@ sent = "Peter went to London"
 # sent = "The quick brown fox jumps over the lazy dog."
 sent = "Time gains momentum"
 sent = "Jack and Jill went up the hill"
+sent = "Students played Football"
+sent = "I love India"
+sent = "Jack went up the hill"
 doc = nlp(sent)
 sent = list(doc.sents)[0]
 # print(sent._.parse_string)
@@ -20,7 +23,7 @@ d = dict()
 
 
 def p(node):
-    return node.orth_ + node.tag_ + str(node.i) + node.pos_
+    return f"({node.orth_}, {node.tag_})" #node.orth_ + node.tag_ + str(node.i) + node.pos_
 
 
 def to_nltk_tree(node):
@@ -39,6 +42,7 @@ PRODUCTIONS = {
     ("PRON"): "NP",
     ("PROPN"): "NP",
     ("DET", "Nominal"): "NP",
+    ("Nominal"): "NP",
     ("Nominal", "NOUN"): "Nominal",
     ("NOUN"): "Nominal",
     ("VERB"): "VP",
@@ -57,8 +61,7 @@ def get_chunk_tag(node):
         return memo_chunk[node.i]
     if not (node.n_lefts or node.n_rights):
         if (node.pos_) in PRODUCTIONS:
-            return PRODUCTIONS[node.pos_]
-        return node.pos_
+            curr = PRODUCTIONS[node.pos_]
     curr = node.pos_
     num_children = node.n_lefts + node.n_rights
     lefts = list(node.lefts)[::-1]
@@ -67,6 +70,7 @@ def get_chunk_tag(node):
     while num_children:
         if i > 10:
             print(f"ERR on {node}, with {lefts}, {rights}")
+            # print(get_chunk_tag(lefts[0]), get_chunk_tag(rights[0]))
             return curr
         i += 1
         if node.i == 3:
@@ -85,8 +89,8 @@ def get_chunk_tag(node):
                 curr = PRODUCTIONS[rr]
                 # print(curr, ':\t', list(node.subtree) + list(rights.pop(0).subtree),)
                 continue
-        if curr in PRODUCTIONS:
-            curr = PRODUCTIONS[node.pos_]
+    while curr in PRODUCTIONS:
+        curr = PRODUCTIONS[curr]
         # print("GOT NOTHING", node, lefts, rights)
         # print([get_chunk_tag(l) for l in lefts], node.pos_,  [get_chunk_tag(r) for r in rights])
         # print('-'*30)
