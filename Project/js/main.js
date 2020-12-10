@@ -28,8 +28,7 @@ var app = new Vue({
 
   mounted(){
     //else
-    this.serverURL = 'http://localhost:8000/'
-    this.baseURL = this.serverURL
+    app.baseURL = 'https://nlpserver.southeastasia.cloudapp.azure.com:80/'
     shuffleDevs();
   },
 
