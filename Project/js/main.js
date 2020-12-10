@@ -29,7 +29,7 @@ var app = new Vue({
   mounted(){
     //else
     //this.serverURL = 'https://13.67.88.180/'
-    app.serverURL = 'https://nlpserver.southeastasia.cloudapp.azure.com:80/'
+    this.serverURL = 'https://nlpserver.southeastasia.cloudapp.azure.com:80/'
     this.baseURL = this.serverURL
     shuffleDevs();
   },
