@@ -1,0 +1,235 @@
+$bgDefault      : #4285f4;
+$bgHighlight    : #2c5ca8;
+$colDefault     : #ffffff;
+$colHighlight   : #fff;
+$dropDown       : true;
+.navbar-default {
+  background-color: $bgDefault;
+  border-color: $bgHighlight;
+  .navbar-brand {
+    color: $colDefault;
+    &:hover, &:focus {
+  color: $colHighlight; }}
+  .navbar-text {
+  color: $colDefault; }
+  .navbar-nav {
+    > li {
+      > a {
+        color: $colDefault;
+        &:hover,  &:focus {
+      color: $colHighlight; }}
+      @if $dropDown {
+        > .dropdown-menu {
+          background-color: $bgDefault;
+          > li {
+            > a {
+              color: $colDefault;
+              &:hover,  &:focus {
+                color: $colHighlight;
+            background-color: $bgHighlight; }}
+            &.divider {
+    background-color: $bgHighlight;}}}}}
+    > .active {
+      > a, > a:hover, > a:focus {
+        color: $colHighlight;
+    background-color: $bgHighlight; }}
+    > .open {
+      > a, > a:hover, > a:focus {
+        color: $colHighlight;
+  background-color: $bgHighlight; }}}
+  .navbar-toggle {
+    border-color: $bgHighlight;
+    &:hover, &:focus {
+    background-color: $bgHighlight; }
+    .icon-bar {
+  background-color: $colDefault; }}
+  .navbar-collapse,
+  .navbar-form {
+  border-color: $colDefault; }
+  .navbar-link {
+    color: $colDefault;
+    &:hover {
+color: $colHighlight; }}}
+@media (max-width: 767px) {
+  .navbar-default .navbar-nav .open .dropdown-menu {
+    > li > a {
+      color: $colDefault;
+      &:hover, &:focus {
+    color: $colHighlight; }}
+    > .active {
+      > a, > a:hover, > a:focus {
+        color: $colHighlight;
+  background-color: $bgHighlight; }}}
+}
+
+main {
+  #status {
+    margin-bottom: 20px;
+  }
+
+  .file-wrapper {
+    text-align: center;
+    // width: 400px;
+    height: 95px;
+    vertical-align: middle;
+    position: relative;
+    overflow: hidden;
+    border: 3px dashed gray;
+    font-size: 14px;
+
+    &.default {
+      line-height: 80px;
+    }
+    &.highlight {
+      font-weight: bold;
+      opacity: 50%;
+      border: 3px dashed blue;
+      font-size: 0;
+      &::after {
+        font-size: 14px;
+        content: "Release to upload!";
+      }
+    }
+
+    input {
+      position: absolute;
+      top: 0;
+      right: 0; /* not left, because only the right part of the input seems to be clickable in some browser I can't remember */
+      cursor: pointer;
+      opacity: 0.0;
+      filter: alpha(opacity=0); /* and all the other old opacity stuff you want to support */
+      font-size: 300px; /* apparently the most reliable way to make a large part of the input clickable in most browsers */
+      height: 200px;
+    }
+  }
+
+  .imagepreview {
+    max-width: 100px;
+    max-height: 50px;
+    margin: 10px;
+  }
+
+
+  #results {
+    .card {
+      height: 300px;
+      //border: 2px solid blue;
+      //background-color: yellow;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      position:relative;
+
+      .card-header {
+        max-height: 40%;
+        overflow:hidden;
+        padding-top:20px;
+
+        .img {
+          height: 100%;
+        }
+        .title {
+          font-size: 18px;
+        }
+      }
+
+      .card-body {
+        margin-top: 10px;
+        overflow: hidden;
+      }
+
+      .card-footer {
+        position:absolute;
+        bottom: 0px;
+        width: 96%;
+        height: 30%;
+        vertical-align: bottom;
+        background-color: skyblue;
+        margin: 2%;
+        border-radius: 6px;
+
+        .v-space {
+          height: 10%;
+        }
+        img {
+          height: 60%;
+          margin: auto;
+        }
+        .see-more {
+          text-align: center;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  #tests {
+    //overflow: hidden;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-around;
+    div {
+    }
+  }
+  padding-bottom: 1000px;
+  .tcase {
+    border: 1px solid white;
+    height: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    &:hover {
+      border: 1px dashed black;
+    }
+    .videocover { // This hack so embedded videos don't capture clicks on them
+      background: red;
+      z-index: 100;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+    }
+  }
+  #share {
+    position: fixed;
+    right: -1px;
+    padding: 5px;
+    border-radius: 10px 0 0 10px;
+    top: 50%;
+    vertical-align: middle;
+    padding: auto;
+    background: #3275e4;
+    &:hover {
+      background: #4285f4;
+      cursor: copy;
+    }
+    a {
+      margin: auto;
+      &:hover {
+        text-decoration: none;
+      }
+      i {
+        color: white;
+        font-size: 25px;
+      }
+      .text {
+        color: white;
+        margin: 1px;
+        font-weight: bold;
+        text-transform: uppercase;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+      }
+    }
+  }
+  #query_link {
+    position: fixed;
+    width: 1;
+    height: 1;
+    left: -1000px; // hide this
+  }
+}
