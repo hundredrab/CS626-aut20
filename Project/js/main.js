@@ -67,7 +67,7 @@ var app = new Vue({
           if (response.status==200){
             if (response.data.nearRhymes?.length) {
               app.nearRhymes = response.data.nearRhymes
-              app.status = "Fetched " + (app.nearRhymes.length) + " results in " + Math.round(app.search_time) + "msec."
+              app.status = "Fetched " + (app.nearRhymes.length) + " results."
             } else {
               app.nearRhymes = []
               app.status = response.data.output
