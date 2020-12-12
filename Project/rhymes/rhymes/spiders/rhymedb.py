@@ -12,13 +12,11 @@ class RhymedbSpider(CrawlSpider):
 
     rules = (
         Rule(LinkExtractor(allow=r"/az/\w"), callback=None),
-        # Rule(LinkExtractor(allow=r"/az/a"), callback=None),
         Rule(
             LinkExtractor(allow=r"/word/\w+"),
             # LinkExtractor(allow=r"/word/cabals"),
             callback="parse_index_page",
         ),
-        # Rule(LinkExtractor(allow=r'/az/\w'), callback='parse_index_page', follow=True),
     )
 
     def parse_index_page(self, response):
@@ -31,5 +29,4 @@ class RhymedbSpider(CrawlSpider):
             "rhymes3",
             './a[not(contains(@class, "top2") or contains(@class, "top1"))]/text()',
         )
-        # item.add_xpath('rhymes1', '//span[contains(@class, "content")]/a/text()')
         return item.load_item()
