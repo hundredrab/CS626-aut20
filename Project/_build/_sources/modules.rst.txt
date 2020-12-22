@@ -1,0 +1,6 @@
+CS626-aut20
+===========
+
+.. toctree::
+   :maxdepth: 4
+

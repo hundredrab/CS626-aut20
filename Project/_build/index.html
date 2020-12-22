@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>RhymeCheck Server &#8212; RhymeCheck  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-server">
+<span id="rhymecheck-server"></span><h1>RhymeCheck Server<a class="headerlink" href="#module-server" title="Permalink to this headline">¶</a></h1>
+<p>API Server to get results from the model.</p>
+<p>Based on a simple BaseHttpServer.</p>
+<dl class="class">
+<dt id="server.APIServer">
+<em class="property">class </em><code class="sig-prename descclassname">server.</code><code class="sig-name descname">APIServer</code><span class="sig-paren">(</span><em class="sig-param">request</em>, <em class="sig-param">client_address</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#server.APIServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic server to handle incoming API requests.</p>
+<dl class="method">
+<dt id="server.APIServer.do_GET">
+<code class="sig-name descname">do_GET</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.APIServer.do_GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle GET requests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="server.APIServer.do_OPTIONS">
+<code class="sig-name descname">do_OPTIONS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.APIServer.do_OPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle OPTIONS requests.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="server.RhymeDataset">
+<em class="property">class </em><code class="sig-prename descclassname">server.</code><code class="sig-name descname">RhymeDataset</code><span class="sig-paren">(</span><em class="sig-param">X_a</em>, <em class="sig-param">X_b</em>, <em class="sig-param">label</em><span class="sig-paren">)</span><a class="headerlink" href="#server.RhymeDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset class for the model.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="server.RhymingClassifier">
+<em class="property">class </em><code class="sig-prename descclassname">server.</code><code class="sig-name descname">RhymingClassifier</code><a class="headerlink" href="#server.RhymingClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary Classification model.</p>
+<dl class="method">
+<dt id="server.RhymingClassifier.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="headerlink" href="#server.RhymingClassifier.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="server.algorithm">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">algorithm</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get results from the two models.</p>
+<p>Machine Learning go brrrr.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.demo">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">demo</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">word1</em>, <em class="sig-param">word2</em><span class="sig-paren">)</span><a class="headerlink" href="#server.demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the confidence of word1 and word2 being rhymes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.encode_pronuns">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">encode_pronuns</code><span class="sig-paren">(</span><em class="sig-param">pronun_set</em><span class="sig-paren">)</span><a class="headerlink" href="#server.encode_pronuns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode pronunciations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.getTopKRhymes">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">getTopKRhymes</code><span class="sig-paren">(</span><em class="sig-param">word</em><span class="sig-paren">)</span><a class="headerlink" href="#server.getTopKRhymes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get top K rhymes given word.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.get_data">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from cmudict</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.get_details">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">get_details</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#server.get_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts results from algorithms into human-friendly mesages.</p>
+<p>If a single data point is present, returns top k rhymes.
+If two data points are present,  returns whether they rhyme.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.get_feature_vector">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">get_feature_vector</code><span class="sig-paren">(</span><em class="sig-param">word</em>, <em class="sig-param">word2pronun</em>, <em class="sig-param">pronun_set</em>, <em class="sig-param">pronun2vec</em><span class="sig-paren">)</span><a class="headerlink" href="#server.get_feature_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get feature vector given word.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.run">
+<code class="sig-prename descclassname">server.</code><code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">server_class=&lt;class 'http.server.HTTPServer'&gt;</em>, <em class="sig-param">handler_class=&lt;class 'server.APIServer'&gt;</em>, <em class="sig-param">addr='localhost'</em>, <em class="sig-param">port=8000</em><span class="sig-paren">)</span><a class="headerlink" href="#server.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the server.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Sourab Jha, Shubham Mishra, Kartavya Kothari.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

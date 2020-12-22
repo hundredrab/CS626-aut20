@@ -1,0 +1,178 @@
+.navbar-default {
+  background-color: #4285f4;
+  border-color: #2c5ca8; }
+  .navbar-default .navbar-brand {
+    color: #ffffff; }
+    .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+      color: #fff; }
+  .navbar-default .navbar-text {
+    color: #ffffff; }
+  .navbar-default .navbar-nav > li > a {
+    color: #ffffff; }
+    .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+      color: #fff; }
+  .navbar-default .navbar-nav > li > .dropdown-menu {
+    background-color: #4285f4; }
+    .navbar-default .navbar-nav > li > .dropdown-menu > li > a {
+      color: #ffffff; }
+      .navbar-default .navbar-nav > li > .dropdown-menu > li > a:hover, .navbar-default .navbar-nav > li > .dropdown-menu > li > a:focus {
+        color: #fff;
+        background-color: #2c5ca8; }
+    .navbar-default .navbar-nav > li > .dropdown-menu > li.divider {
+      background-color: #2c5ca8; }
+  .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+    color: #fff;
+    background-color: #2c5ca8; }
+  .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    color: #fff;
+    background-color: #2c5ca8; }
+  .navbar-default .navbar-toggle {
+    border-color: #2c5ca8; }
+    .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+      background-color: #2c5ca8; }
+    .navbar-default .navbar-toggle .icon-bar {
+      background-color: #ffffff; }
+  .navbar-default .navbar-collapse,
+  .navbar-default .navbar-form {
+    border-color: #ffffff; }
+  .navbar-default .navbar-link {
+    color: #ffffff; }
+    .navbar-default .navbar-link:hover {
+      color: #fff; }
+
+@media (max-width: 767px) {
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    color: #ffffff; }
+    .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+      color: #fff; }
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    color: #fff;
+    background-color: #2c5ca8; } }
+main {
+  padding-bottom: 1000px; }
+  main #status {
+    margin-bottom: 20px; }
+  main .file-wrapper {
+    text-align: center;
+    height: 95px;
+    vertical-align: middle;
+    position: relative;
+    overflow: hidden;
+    border: 3px dashed gray;
+    font-size: 14px; }
+    main .file-wrapper.default {
+      line-height: 80px; }
+    main .file-wrapper.highlight {
+      font-weight: bold;
+      opacity: 50%;
+      border: 3px dashed blue;
+      font-size: 0; }
+      main .file-wrapper.highlight::after {
+        font-size: 14px;
+        content: "Release to upload!"; }
+    main .file-wrapper input {
+      position: absolute;
+      top: 0;
+      right: 0;
+      /* not left, because only the right part of the input seems to be clickable in some browser I can't remember */
+      cursor: pointer;
+      opacity: 0.0;
+      filter: alpha(opacity=0);
+      /* and all the other old opacity stuff you want to support */
+      font-size: 300px;
+      /* apparently the most reliable way to make a large part of the input clickable in most browsers */
+      height: 200px; }
+  main .imagepreview {
+    max-width: 100px;
+    max-height: 50px;
+    margin: 10px; }
+  main #results .card {
+    height: 300px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: relative; }
+    main #results .card .card-header {
+      max-height: 40%;
+      overflow: hidden;
+      padding-top: 20px; }
+      main #results .card .card-header .img {
+        height: 100%; }
+      main #results .card .card-header .title {
+        font-size: 18px; }
+    main #results .card .card-body {
+      margin-top: 10px;
+      overflow: hidden; }
+    main #results .card .card-footer {
+      position: absolute;
+      bottom: 0px;
+      width: 96%;
+      height: 30%;
+      vertical-align: bottom;
+      background-color: skyblue;
+      margin: 2%;
+      border-radius: 6px; }
+      main #results .card .card-footer .v-space {
+        height: 10%; }
+      main #results .card .card-footer img {
+        height: 60%;
+        margin: auto; }
+      main #results .card .card-footer .see-more {
+        text-align: center;
+        font-weight: bold; }
+  main #tests {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-around; }
+  main .tcase {
+    border: 1px solid white;
+    height: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative; }
+    main .tcase:hover {
+      border: 1px dashed black; }
+    main .tcase .videocover {
+      background: red;
+      z-index: 100;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      opacity: 0; }
+  main #share {
+    position: fixed;
+    right: -1px;
+    padding: 5px;
+    border-radius: 10px 0 0 10px;
+    top: 50%;
+    vertical-align: middle;
+    padding: auto;
+    background: #3275e4; }
+    main #share:hover {
+      background: #4285f4;
+      cursor: copy; }
+    main #share a {
+      margin: auto; }
+      main #share a:hover {
+        text-decoration: none; }
+      main #share a i {
+        color: white;
+        font-size: 25px; }
+      main #share a .text {
+        color: white;
+        margin: 1px;
+        font-weight: bold;
+        text-transform: uppercase;
+        writing-mode: vertical-rl;
+        text-orientation: upright; }
+  main #query_link {
+    position: fixed;
+    width: 1;
+    height: 1;
+    left: -1000px; }
+
+/*# sourceMappingURL=main.css.map */
